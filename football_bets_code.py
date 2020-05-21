@@ -1,3 +1,4 @@
+# %% 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -88,9 +89,17 @@ def score_data_frame(cumulated_odds, bet_values, w_l):
                                         +df_final["result_of_bet"].iloc[x+1])
     return df_final
 
-def line_plot_all_methodes(methodes=[]):
-    for x in methodes:
-        plt.plot(range(0,190), x, label=x)
+def line_plot_all_methodes(methodes=[],labels=[]):
+    """Function creates line plot of score in time of all chosen bet methodes"""
+    
+    for (x,y) in zip(methodes,labels):
+        plt.plot(range(0,190), x, label=y)
+    
+    plt.title("Score in time")
+    plt.xlabel("Matchweek number")
+    plt.ylabel("Amount of money")
+    plt.legend()
+   
     
 # %%
 def generating_plots(data_plot_1, data_plot_2, data_plot_3, data_plot_4, start_budget):
@@ -154,7 +163,7 @@ generating_plots(min_H_5["cumulated_odds"],
 # %%
 #Example of a bet method 
 start_budget=3000
-num_of_games= 2
+num_of_games= 3
 type_of_score = 'max' #MIN or MAX ODDS
 bet_side = 'B365H' # H or A or D    
 
@@ -170,7 +179,7 @@ generating_plots(min_H_3["cumulated_odds"],
 # %%
 #Example of a bet method 
 start_budget=3000
-num_of_games= 4
+num_of_games= 2
 type_of_score = 'max' #MIN or MAX ODDS
 bet_side = 'B365H' # H or A or D    
 
@@ -178,13 +187,17 @@ method_odds = games_in_matchweek(num_of_games, type_of_score, bet_side)
 cumulated_odds = cumulating_odds(method_odds)
 all_bet_values = bet_values(4.5, 9, 13.5)
 w_l = win_or_lose(bet_side, num_of_games)
-min_H_4 = score_data_frame(cumulated_odds, all_bet_values, w_l)
-generating_plots(min_H_4["cumulated_odds"], 
-                 min_H_4["win_or_loss"].value_counts(normalize=True), 
-                 min_H_4["bet_value"].value_counts(normalize=True), 
-                 min_H_4['score_in_time'], 3000)
+max_H_2 = score_data_frame(cumulated_odds, all_bet_values, w_l)
+generating_plots(max_H_2["cumulated_odds"], 
+                 max_H_2["win_or_loss"].value_counts(normalize=True), 
+                 max_H_2["bet_value"].value_counts(normalize=True), 
+                 max_H_2['score_in_time'], 3000)
 
 
 #%%
+#Generating line plots of score in time of all methodes 
+line_plot_all_methodes([min_H_5['score_in_time'], max_H_2['score_in_time'], 
+                min_H_3['score_in_time']],
+                labels=['min_H_5', 'max_H_2', 'min_H_3'])
 
-line_plot_all_methodes([min_H_2['score_in_time'], min_H_3['score_in_time']])
+# %%
