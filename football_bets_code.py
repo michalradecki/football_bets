@@ -11,7 +11,11 @@ odds4 = pd.read_csv('Season_17.18.csv', delimiter = ",")
 odds5 = pd.read_csv('Season_18.19.csv', delimiter = ";")
 
 
-odds_all = odds1.append(odds2, sort=False).append(odds3, sort=False).append(odds4, sort=False).append(odds5, sort=False)
+odds_all = odds1.append(odds2, 
+           sort=False).append(odds3, 
+           sort=False).append(odds4, 
+           sort=False).append(odds5, 
+           sort=False)
 
 
 relevant_columns = ["Date", "HomeTeam", "AwayTeam", "FTR", 'B365H', 'B365D', 'B365A', 'BWH', 'BWD', 'BWA']
@@ -38,20 +42,20 @@ def games_in_matchweek(num_of_games, type_of_score, bet_side):
             method_odds.append(pd.DataFrame(matches))
     return method_odds
 
-def cumulating_odds(method_odds):
+def cumulated_odds(method_odds):
     """Function calculate cumulated odds based on matches selected
     in games_in_matchweek() function"""
-    cumulated_odds=[]
+    cumulated_odds_list=[]
     for x in method_odds:
         x = list(x[bet_side])
         x = np.prod(np.array(x))
-        cumulated_odds.append(x)
-    return cumulated_odds
+        cumulated_odds_list.append(x)
+    return cumulated_odds_list
 
 def bet_values(minimum, middle, maximum):
     """Function calculates bets value based on cumulated odds"""
     all_bet_values = []
-    for odd in cumulated_odds:
+    for odd in cumulated_odds_v:
         if odd < minimum:
             bet_value=start_budget * 0.01
         elif odd > minimum and odd < middle:
@@ -66,18 +70,18 @@ def bet_values(minimum, middle, maximum):
 def win_or_lose(bet_side, num_of_games):
     """Function checks whether ticket won or lost"""
     result_list = [bet_side[-1]]*num_of_games
-    win_not = []
+    win_or_not = []
     for x in method_odds:
         if result_list == list(x['FTR']):
-            win_not.append(1)
+            win_or_not.append(1)
         else:
-            win_not.append(0)
-    return win_not
+            win_or_not.append(0)
+    return win_or_not
 
     
-def score_data_frame(cumulated_odds, bet_values, w_l):
+def score_data_frame(cumulated_odds, bet_values, win_or_not):
     """Function creates data frame of data calculated in previous functions"""
-    dic = {"cumulated_odds": cumulated_odds, "bet_value": bet_values, "win_or_loss": w_l}
+    dic = {"cumulated_odds": cumulated_odds, "bet_value": bet_values, "win_or_loss": win_or_not}
     df_final = pd.DataFrame(dic)
     df_final.loc[df_final["win_or_loss"] == 1, "result_of_bet"] = (df_final["cumulated_odds"] 
                                             * df_final["bet_value"] * df_final["win_or_loss"])
@@ -89,10 +93,10 @@ def score_data_frame(cumulated_odds, bet_values, w_l):
                                         +df_final["result_of_bet"].iloc[x+1])
     return df_final
 
-def line_plot_all_methodes(methodes=[],labels=[]):
-    """Function creates line plot of score in time of all chosen bet methodes"""
+def line_plot_all_methods(methods=[],labels=[]):
+    """Function creates line plot of score in time of all chosen bet methods"""
     
-    for (x,y) in zip(methodes,labels):
+    for (x,y) in zip(methods,labels):
         plt.plot(range(0,190), x, label=y)
     
     plt.title("Score in time")
@@ -102,7 +106,7 @@ def line_plot_all_methodes(methodes=[],labels=[]):
    
     
 # %%
-def generating_plots(data_plot_1, data_plot_2, data_plot_3, data_plot_4, start_budget):
+def generate_plots(data_plot_1, data_plot_2, data_plot_3, data_plot_4, start_budget):
     """
     Function generates a summary of a given method
     example:
@@ -152,11 +156,11 @@ type_of_score = 'min' #MIN or MAX ODDS
 bet_side = 'B365H' # H or A or D    
 
 method_odds = games_in_matchweek(num_of_games, type_of_score, bet_side)
-cumulated_odds = cumulating_odds(method_odds)
+cumulated_odds_v = cumulated_odds(method_odds)
 all_bet_values = bet_values(15, 20, 25)
 w_l = win_or_lose(bet_side, num_of_games)
-min_H_5 = score_data_frame(cumulated_odds, all_bet_values, w_l)
-generating_plots(min_H_5["cumulated_odds"],
+min_H_5 = score_data_frame(cumulated_odds_v, all_bet_values, w_l)
+generate_plots(min_H_5["cumulated_odds"],
                  min_H_5["win_or_loss"].value_counts(normalize=True),
                  min_H_5["bet_value"].value_counts(normalize=True), 
                  min_H_5['score_in_time'], 10000)
@@ -168,11 +172,11 @@ type_of_score = 'max' #MIN or MAX ODDS
 bet_side = 'B365H' # H or A or D    
 
 method_odds = games_in_matchweek(num_of_games, type_of_score, bet_side)
-cumulated_odds = cumulating_odds(method_odds)
+cumulated_odds_v = cumulated_odds(method_odds)
 all_bet_values = bet_values(4.5, 9, 13.5)
 w_l = win_or_lose(bet_side, num_of_games)
-min_H_3 = score_data_frame(cumulated_odds, all_bet_values, w_l)
-generating_plots(min_H_3["cumulated_odds"],
+min_H_3 = score_data_frame(cumulated_odds_v, all_bet_values, w_l)
+generate_plots(min_H_3["cumulated_odds"],
                  min_H_3["win_or_loss"].value_counts(normalize=True),
                  min_H_3["bet_value"].value_counts(normalize=True), 
                  min_H_3['score_in_time'], 3000)
@@ -184,20 +188,22 @@ type_of_score = 'max' #MIN or MAX ODDS
 bet_side = 'B365H' # H or A or D    
 
 method_odds = games_in_matchweek(num_of_games, type_of_score, bet_side)
-cumulated_odds = cumulating_odds(method_odds)
+cumulated_odds_v = cumulated_odds(method_odds)
 all_bet_values = bet_values(4.5, 9, 13.5)
 w_l = win_or_lose(bet_side, num_of_games)
-max_H_2 = score_data_frame(cumulated_odds, all_bet_values, w_l)
-generating_plots(max_H_2["cumulated_odds"], 
+max_H_2 = score_data_frame(cumulated_odds_v, all_bet_values, w_l)
+generate_plots(max_H_2["cumulated_odds"], 
                  max_H_2["win_or_loss"].value_counts(normalize=True), 
                  max_H_2["bet_value"].value_counts(normalize=True), 
                  max_H_2['score_in_time'], 3000)
 
 
 #%%
-#Generating line plots of score in time of all methodes 
-line_plot_all_methodes([min_H_5['score_in_time'], max_H_2['score_in_time'], 
+#Generating line plots of score in time of all methods 
+line_plot_all_methods([min_H_5['score_in_time'], max_H_2['score_in_time'], 
                 min_H_3['score_in_time']],
                 labels=['min_H_5', 'max_H_2', 'min_H_3'])
+
+
 
 # %%
